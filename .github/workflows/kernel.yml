@@ -10,20 +10,16 @@ on:
         description: 'KERNEL_BRANCH'
         required: true
       CLANG_URL:
-        description: 'ClANG_VERSION'
+        description: 'CLANG_VERSION'
         required: true
         default: https://gitlab.com/mcdofrenchfreis/android-clang-14.0.7.git
       CLANG_BRANCH:
-        description: 'ClANG_BRANCH'
+        description: 'CLANG_BRANCH'
         required: true
       DEFCONFIG:
         description: 'KERNEL_DEFCONFIG'
         required: true
         default: fleur_defconfig
-      ANYKERNEL3_URL:
-        description: 'ANYKERNEL3_URL'
-        required: true
-        default: https://github.com/farelfair/AnyKernel3.git
 
 jobs:
   build:
@@ -37,6 +33,8 @@ jobs:
         echo "::group::User Environment Variables"
         echo "KERNEL url: ${{ github.event.inputs.KERNEL_URL }}"
         echo "KERNEL branch: ${{ github.event.inputs.KERNEL_BRANCH }}"
+        echo "clang url: ${{ github.event.inputs.CLANG_URL }}"
+        echo "clang branch: ${{ github.event.inputs.ClANG_BRANCH }}"
         echo "defconfig: ${{ github.event.inputs.DEFCONFIG }}"
         echo "::endgroup::"
 
@@ -56,15 +54,13 @@ jobs:
           software-properties-common ssh sudo wget zip zlib1g \
           zlib1g-dev
 
-    - name: clone Clang & Kernel & AnyKernel3
+    - name: Clone Clang
       run: |
-        git clone --b "${{ github.event.inputs.CLANG_BRANCH }}" \
-          "${{ github.event.inputs.CLANG_URL }}" toolchain
+        git clone -b "${{ inputs.CLANG_BRANCH }}" "${{ inputs.CLANG_URL }}" toolchain
 
-        git clone --b "${{ github.event.inputs.KERNEL_BRANCH }}" \
-          "${{ github.event.inputs.KERNEL_URL }}" kernel
-
-        git clone "${{ github.event.inputs.ANYKERNEL3_URL }}" AnyKernel3
+    - name: Clone Kernel
+      run: |
+        git clone -b "${{ inputs.KERNEL_BRANCH }}" "${{ inputs.KERNEL_URL }}" kernel
 
     - name: Compile Kernel
       run: |
