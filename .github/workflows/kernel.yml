@@ -70,12 +70,12 @@ jobs:
       run: |
         cd kernel
 
-          export PATH=$(pwd)/../toolchain/bin:$PATH
-          export CROSS_COMPILE=$(pwd)/../toolchain/bin/aarch64-linux-gnu-
-          export CC=$(pwd)/../toolchain/bin/clang
-          export CLANG_TRIPLE=aarch64-linux-gnu-
-          export ARCH=arm64
-          export ANDROID_MAJOR_VERSION=r
+        export PATH=$(pwd)/../toolchain/bin:$PATH
+        export CROSS_COMPILE=$(pwd)/../toolchain/bin/aarch64-linux-gnu-
+        export CC=$(pwd)/../toolchain/bin/clang
+        export CLANG_TRIPLE=aarch64-linux-gnu-
+        export ARCH=arm64
+        export ANDROID_MAJOR_VERSION=r
 
-          make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 ${{ github.event.inputs.DEFCONFIG }}
-          make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 -j$(nproc)
+        make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 ${{ github.event.inputs.DEFCONFIG }}
+        make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 -j$(nproc)
