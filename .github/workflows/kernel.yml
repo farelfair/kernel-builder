@@ -96,14 +96,25 @@ jobs:
         zip -r9 "../$ZIP_NAME" *
         echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
 
+    - name: Set Build Metadata
+      run: |
+        DATE=$(date +%Y%m%d)
+        TAG_NAME="${{ github.event.inputs.DEVICE }}-v${{ github.event.inputs.RELEASE }}-${DATE}"
+        ZIP_NAME="${{ github.event.inputs.DEVICE }}-${{ github.event.inputs.RELEASE }}-${DATE}.zip"
+        echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+        echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
+        echo "BUILD_DATE=$(date +%Y-%m-%d)" >> $GITHUB_ENV
+
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
       with:
         files: ${{ env.ZIP_NAME }}
-        name: Firefly-${{ github.run_id }}
-        tag_name: firefly-${{ github.run_id }}
+        name: ${{ env.TAG_NAME }}
+        tag_name: ${{ env.TAG_NAME }}
         body: |
-          🚀 Device: Firefly
-          📅 Build Time: $(date +%Y-%m-%d)
+          📱 Device: `${{ github.event.inputs.DEVICE }}`
+          🛠️ Defconfig: `${{ github.event.inputs.DEFCONFIG }}`
+          📦 Version: `v${{ github.event.inputs.RELEASE }}`
+          📅 Build Date: `${{ env.BUILD_DATE }}`
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
