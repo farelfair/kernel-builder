@@ -56,15 +56,15 @@ jobs:
           software-properties-common ssh sudo wget zip zlib1g \
           zlib1g-dev
 
-    - name: Clone Clang
+    - name: clone Clang & Kernel & AnyKernel3
       run: |
         git clone --b "${{ github.event.inputs.CLANG_BRANCH }}" \
           "${{ github.event.inputs.CLANG_URL }}" toolchain
 
-    - name: Clone Kernel Source
-      run: |
         git clone --b "${{ github.event.inputs.KERNEL_BRANCH }}" \
           "${{ github.event.inputs.KERNEL_URL }}" kernel
+
+        git clone "${{ github.event.inputs.ANYKERNEL3_URL }}" AnyKernel3
 
     - name: Compile Kernel
       run: |
