@@ -103,7 +103,7 @@ jobs:
         name: Firefly-${{ github.run_id }}
         tag_name: firefly-${{ github.run_id }}
         body: |
-          Device: Firefly
-          Build Time: $(date +%Y-%m-%d)
+          Device: "${{ github.event.inputs.DEVICE }}"
+          Defconfig: ${{ github.event.inputs.DEFCONFIG }}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
