@@ -92,7 +92,7 @@ jobs:
       run: |
         cp $(pwd)/kernel/out/arch/arm64/boot/Image $(pwd)/AnyKernel3/
         cd AnyKernel3
-        ZIP_NAME="${{ github.event.inputs.DEVICE }}-$(date +%Y%m%d-%H%M)_${{ github.event.inputs.RELEASE }}.zip"
+        ZIP_NAME="AnyKernel3-android14-4.19.191-${{ github.event.inputs.DEVICE }}-${{ github.event.inputs.RELEASE }}.zip"
         zip -r9 "../$ZIP_NAME" *
         echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
       
@@ -100,10 +100,11 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: ${{ env.ZIP_NAME }}
-        name: Kernel_${{ github.event.inputs.DEVICE }}-${{ github.event.inputs.RELEASE }}
-        tag_name: Kernel_${{ github.event.inputs.DEVICE }}-${{ github.event.inputs.RELEASE }}
+        name: New Kernel ${{ github.event.inputs.DEVICE }} Release ${{ github.event.inputs.RELEASE }}
+        tag_name: 4.19.191
         body: |
-          Device: ${{ github.event.inputs.DEVICE }}
-          Defconfig: ${{ github.event.inputs.DEFCONFIG }}
+          Informations:
+          -> Device: ${{ github.event.inputs.DEVICE }}
+          -> Defconfig: ${{ github.event.inputs.DEFCONFIG }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
