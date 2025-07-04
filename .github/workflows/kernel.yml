@@ -62,12 +62,6 @@ jobs:
         git clone --b "${{ github.event.inputs.KERNEL_BRANCH }}" \
           "${{ github.event.inputs.KERNEL_URL }}" kernel
 
-    - name: Compile Kernel
-        run: |
-          cd kernel
-          # setup environment
-          bash kernel/compile.sh
-
     - name: Clone AnyKernel3
         run: |
           git clone https://github.com/farelfair/AnyKernel3.git
