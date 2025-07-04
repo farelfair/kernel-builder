@@ -1,7 +1,7 @@
 name: Build kernel on ubuntu 22.04
 
 on:
-  workflows_dispatch:
+  workflow_dispatch:
     inputs:
       KERNEL_URL:
         description: 'KERNEL_URL'
