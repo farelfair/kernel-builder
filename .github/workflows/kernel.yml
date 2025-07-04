@@ -12,6 +12,7 @@ on:
       DEFCONFIG:
         description: 'KERNEL_DEFCONFIG'
         required: true
+        default: fleur_defconfig
 
 jobs:
   build:
@@ -20,7 +21,7 @@ jobs:
     permissions:
       contents: write
     steps:
-    - name: Print Environment Variables
+    - name: Display Run Parameters
       run: |
         echo "::group::User Environment Variables"
         echo "KERNEL url: ${{ github.event.inputs.KERNEL_URL }}"
@@ -32,7 +33,7 @@ jobs:
     - name: Check Out
       uses: actions/checkout@v4
 
-    - name: Install Dependecies
+    - name: Prepare the environment
       run: |
         sudo apt update -y
         sudo apt install -y \
