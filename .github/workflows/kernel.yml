@@ -6,7 +6,7 @@ on:
       KERNEL_URL:
         description: 'KERNEL_URL'
         required: true
-        default: 'https://github.com/MiCode/Xiaomi_Kernel_OpenSource'
+        default:
       KERNEL_BRANCH:
         description: 'KERNEL_BRANCH'
         required: true
@@ -14,7 +14,7 @@ on:
       DEFCONFIG:
         description: 'Example ( fleur_defconfig )'
         required: true
-        default: "fleur_defconfig"
+        default:
 
 jobs:
   build:
