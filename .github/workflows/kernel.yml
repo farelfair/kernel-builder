@@ -6,15 +6,12 @@ on:
       KERNEL_URL:
         description: 'KERNEL_URL'
         required: true
-        default:
       KERNEL_BRANCH:
         description: 'KERNEL_BRANCH'
         required: true
-        default:
       DEFCONFIG:
         description: 'KERNEL_DEFCONFIG'
         required: true
-        default:
 
 jobs:
   build:
@@ -23,7 +20,7 @@ jobs:
     permissions:
       contents: write
     steps:
-    - name:
+    - name: Print Environment Variables
       run: |
         echo "::group::User Environment Variables"
         echo "KERNEL url: ${{ github.event.inputs.KERNEL_URL }}"
@@ -37,4 +34,13 @@ jobs:
 
     - name: Install Dependecies
       run: |
-        sudo apt update -y && sudo apt upgrade -y && sudo apt install nano bc bison ca-certificates curl flex gcc git libc6-dev libssl-dev openssl python-is-python3 ssh wget zip zstd sudo make clang gcc-arm-linux-gnueabi software-properties-common build-essential libarchive-tools gcc-aarch64-linux-gnu -y && sudo apt install build-essential -y && sudo apt install libssl-dev libffi-dev libncurses5-dev zlib1g zlib1g-dev libreadline-dev libbz2-dev libsqlite3-dev make gcc -y && sudo apt install pigz -y && sudo apt install python2 -y && sudo apt install python3 -y && sudo apt install cpio -y && sudo apt install lld -y && sudo apt install llvm -y && sudo apt-get install g++-aarch64-linux-gnu -y && sudo apt install libelf-dev -y && sudo apt install neofetch -y && neofetch
+        sudo apt update -y
+        sudo apt install -y \
+          bc bison build-essential ca-certificates clang curl cpio \
+          flex gcc gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+          git libarchive-tools libc6-dev libelf-dev libffi-dev \
+          libncurses5-dev libreadline-dev libsqlite3-dev libssl-dev \
+          lld llvm make nano neofetch openssl pigz python2 python3 \
+          software-properties-common ssh sudo wget zip zlib1g \
+          zlib1g-dev
+        neofetch
