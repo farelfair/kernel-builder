@@ -11,7 +11,7 @@ on:
         description: 'KERNEL_BRANCH'
         required: true
         default:
-      DEFCONFIG:
+      DEFCONFIG: 'KERNEL_DEFCONFIG'
         description:
         required: true
         default:
