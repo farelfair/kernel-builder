@@ -64,7 +64,7 @@ jobs:
         git clone --b "${{ github.event.inputs.KERNEL_BRANCH }}" \
           "${{ github.event.inputs.KERNEL_URL }}" kernel
 
-        git clone "${{ github.event.inputs.ANYKERNEL3_URL }}" AnyKernel3
+        git clone "${{ github.event.inputs.ANYKERNEL3_URL }}" AnyKernel3 
 
     - name: Compile Kernel
       run: |
