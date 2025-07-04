@@ -19,6 +19,9 @@ on:
       DEVICE:
         description: 'DEVICE NAME (e.g. fleur)'
         required: true
+      RELEASE:
+        description: 'release kernel example 1.0'
+        required: true
       DEFCONFIG:
         description: 'KERNEL_DEFCONFIG'
         required: true
@@ -39,6 +42,7 @@ jobs:
         echo "clang url: ${{ github.event.inputs.CLANG_URL }}"
         echo "clang branch: ${{ github.event.inputs.ClANG_BRANCH }}"
         echo "device name: ${{ github.event.inputs.DEVICE }}"
+        echo "release: ${{ github.event.inputs.RELEASE }}"
         echo "defconfig: ${{ github.event.inputs.DEFCONFIG }}"
         echo "::endgroup::"
 
