@@ -49,6 +49,7 @@ jobs:
             echo "clang url: ${{ github.event.inputs.CLANG_URL }}"
             echo "clang branch: ${{ github.event.inputs.CLANG_BRANCH }}"
             echo "release kernel: ${{ github.event.inputs.RELEASE_KERNEL }}"
+            echo "defconfig: ${{ github.event.inputs.DEFCONFIG }}"
             echo "::endgroup::"
 
         # You might want to checkout your repo first, but not mandatory
@@ -90,6 +91,10 @@ jobs:
 
             make mrproper
             make clean
+
+            VERSION=$(make kernelversion)
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+            echo "Kernel version: $VERSION"
         
         # Compile Kernel
         - name: compile kernel
@@ -111,7 +116,7 @@ jobs:
           run: |
             cp $(pwd)/kernel/out/arch/arm64/boot/Image $(pwd)/anykernel3/
             cd anykernel3
-            ZIP_NAME="AnyKernel3-android14-4.19.191-${{ github.event.inputs.DEVICE }}-${{ github.event.inputs.RELEASE_KERNEL }}.zip"
+            ZIP_NAME="AnyKernel3-${{ env.VERSION }}-${{ github.event.inputs.DEVICE }}-${{ github.event.inputs.RELEASE_KERNEL }}.zip"
             zip -r9 "../$ZIP_NAME" *
             echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
         
@@ -120,12 +125,13 @@ jobs:
           uses: softprops/action-gh-release@v2
           with:
             files: ${{ env.ZIP_NAME }}
-            name: Non GKI Kernel Release
-            tag_name: 4.19.191
+            name: Non GKI Kernel Release ${{ github.event.inputs.RELEASE_KERNEL }}
+            tag_name: ${{ env.VERSION }}
             body: |
               Informations:
               -> Device: ${{ github.event.inputs.DEVICE }}
               -> Defconfig: ${{ github.event.inputs.DEFCONFIG }}
+              -> Kernel Version: ${{ env.VERSION }}
               -> Kernel Source: ${{ github.event.inputs.KERNEL_URL }}
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
