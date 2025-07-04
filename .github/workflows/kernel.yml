@@ -1,0 +1,40 @@
+name: Build kernel on ubuntu 22.04
+
+on:
+  workflows_dispatch:
+    inputs:
+      KERNEL_URL:
+        description: 'KERNEL_URL'
+        required: true
+        default: 'https://github.com/MiCode/Xiaomi_Kernel_OpenSource'
+      KERNEL_BRANCH:
+        description: 'KERNEL_BRANCH'
+        required: true
+        default: 'main'
+      DEFCONFIG:
+        description: 'Example ( fleur_defconfig )'
+        required: true
+        default: "fleur_defconfig"
+
+jobs:
+  build:
+    if: github.event.repository.owner.id == github.event.sender.id
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+    - name:
+      run: |
+        echo "::group::User Environment Variables"
+        echo "KERNEL url: ${{ github.event.inputs.KERNEL_URL }}"
+        echo "KERNEL branch: ${{ github.event.inputs.KERNEL_BRANCH }}"
+        echo "defconfig: ${{ github.event.inputs.DEFCONFIG }}"
+        echo "::endgroup::"
+
+     # You might want to Checkout your repo first, but not mandatory
+    - name: Check Out
+      uses: actions/checkout@v4
+
+    - name: Install Dependecies
+      run: |
+        sudo apt update -y && sudo apt upgrade -y && sudo apt install nano bc bison ca-certificates curl flex gcc git libc6-dev libssl-dev openssl python-is-python3 ssh wget zip zstd sudo make clang gcc-arm-linux-gnueabi software-properties-common build-essential libarchive-tools gcc-aarch64-linux-gnu -y && sudo apt install build-essential -y && sudo apt install libssl-dev libffi-dev libncurses5-dev zlib1g zlib1g-dev libreadline-dev libbz2-dev libsqlite3-dev make gcc -y && sudo apt install pigz -y && sudo apt install python2 -y && sudo apt install python3 -y && sudo apt install cpio -y && sudo apt install lld -y && sudo apt install llvm -y && sudo apt-get install g++-aarch64-linux-gnu -y && sudo apt install libelf-dev -y && sudo apt install neofetch -y && neofetch
