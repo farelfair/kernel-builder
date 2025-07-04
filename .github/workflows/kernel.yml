@@ -73,5 +73,40 @@ jobs:
     - name: Clone Kernel
       run: |
         git clone -b "${{ inputs.KERNEL_BRANCH }}" "${{ inputs.KERNEL_URL }}" kernel
-        ls
-        pwd
+
+    - name: Compile Kernel
+      run: |
+        cd kernel
+
+        export PATH=$(pwd)/../toolchain/bin:$PATH
+        export CROSS_COMPILE=$(pwd)/../toolchain/bin/aarch64-linux-gnu-
+        export CC=$(pwd)/../toolchain/bin/clang
+        export CLANG_TRIPLE=aarch64-linux-gnu-
+        export ARCH=arm64
+        export ANDROID_MAJOR_VERSION=r
+
+        make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 ${{ github.event.inputs.DEFCONFIG }}
+        make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 -j$(nproc)
+
+    - name: Packing Kernel Image
+      run: |
+        cp $(pwd)/kernel/out/arch/arm64/boot/Image $(pwd)/AnyKernel3/
+        cd AnyKernel3
+        ZIP_NAME="Firefly-$(date +%Y%m%d-%H%M).zip"
+        zip -r9 "../$ZIP_NAME" *
+        echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
+
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ env.ZIP_NAME }}
+        name: Firefly-${{ github.run_id }}
+        tag_name: firefly-${{ github.run_id }}
+        body: |
+          🚀 Device: Firefly
+          📅 Build Time: $(date +%Y-%m-%d)
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
