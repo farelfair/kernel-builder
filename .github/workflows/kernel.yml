@@ -65,7 +65,6 @@ jobs:
     - name: Compile Kernel
         run: |
           cd kernel
-
           # setup environment
           export PATH=$(pwd)/../toolchain/bin:$PATH
           export CROSS_COMPILE=$(pwd)/../toolchain/bin/aarch64-linux-gnu-
