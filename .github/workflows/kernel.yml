@@ -43,3 +43,8 @@ jobs:
           lld llvm make nano neofetch openssl pigz python2 python3 \
           software-properties-common ssh sudo wget zip zlib1g \
           zlib1g-dev
+
+    - name: Clone Kernel Source
+      run: |
+        git clone --branch "${{ github.event.inputs.KERNEL_BRANCH }}" \
+          "${{ github.event.inputs.KERNEL_URL }}" kernel
