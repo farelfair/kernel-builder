@@ -1,110 +1,131 @@
 name: Compile
 
 on:
-  workflow_dispatch:
-    inputs:
-      KERNEL_URL:
-        description: 'KERNEL_URL'
-        required: true
-      KERNEL_BRANCH:
-        description: 'KERNEL_BRANCH'
-        required: true
-      CLANG_URL:
-        description: 'CLANG_VERSION'
-        required: true
-        default: https://gitlab.com/mcdofrenchfreis/android-clang-14.0.7.git
-      CLANG_BRANCH:
-        description: 'CLANG_BRANCH'
-        required: true
-      DEVICE:
-        description: 'DEVICE NAME (e.g. fleur)'
-        required: true
-      RELEASE:
-        description: 'release kernel example 1.0'
-        required: true
-      DEFCONFIG:
-        description: 'KERNEL_DEFCONFIG'
-        required: true
-        default: fleur_defconfig
+    workflow_dispatch:
+        inputs:
+            # your kernel source
+            KERNEL_URL:
+                description: 'KERNEL_URL'
+                required: true
+            # branch kernel
+            KERNEL_BRANCH:
+                description: 'KERNEL_BRANCH'
+                required: true
+            # Device Informations
+            DEVICE:
+                description: 'DEVICE CODENAME'
+                required: true
+            # CLang Version
+            CLANG_URL:
+                description: 'CLANG_URL'
+                required: true
+            # CLang Branch
+            CLANG_BRANCH:
+                description: 'CLANG_BRANCH'
+                required: true
+            # Release kernel
+            RELEASE_KERNEL:
+                description: 'RELEASE_KERNEL e.g ( v1.0 / 1.0 )'
+                required: true
+            # Defconfig Codename
+            DEFCONFIG:
+                description: 'DEFCONFIG e.g ( fleur_defconfig )'
+                required: true
 
 jobs:
-  build:
-    if: github.event.repository.owner.id == github.event.sender.id
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-    steps:
-    - name: Display Run Parameters
-      run: |
-        echo "::group::User Environment Variables"
-        echo "KERNEL url: ${{ github.event.inputs.KERNEL_URL }}"
-        echo "KERNEL branch: ${{ github.event.inputs.KERNEL_BRANCH }}"
-        echo "clang url: ${{ github.event.inputs.CLANG_URL }}"
-        echo "clang branch: ${{ github.event.inputs.ClANG_BRANCH }}"
-        echo "device name: ${{ github.event.inputs.DEVICE }}"
-        echo "release: ${{ github.event.inputs.RELEASE }}"
-        echo "defconfig: ${{ github.event.inputs.DEFCONFIG }}"
-        echo "::endgroup::"
+    build:
+        if: github.event.repository.owner.id == github.event.sender.id
+        runs-on: ubuntu-22.04 # Set Ubuntu 22 Version
+        # github actions permissions
+        permissions:
+            contents: write
+            actions: write
+        steps:
+        - name: Display Run Parameters
+          run: |
+            echo "::group::User Environment Variables"
+            echo "kernel url: ${{ github.event.inputs.KERNEL_URL }}"
+            echo "kernel branch: ${{ github.event.inputs.KERNEL_BRANCH }}"
+            echo "clang url: ${{ github.event.inputs.CLANG_URL }}"
+            echo "clang branch: ${{ github.event.inputs.CLANG_BRANCH }}"
+            echo "release kernel: ${{ github.event.inputs.RELEASE_KERNEL }}"
+            echo "::endgroup::"
 
-     # You might want to Checkout your repo first, but not mandatory
-    - name: Check Out
-      uses: actions/checkout@v4
+        # You might want to checkout your repo first, but not mandatory
+        - name: Check Out
+          uses: actions/checkout@v4
+        
+        # Install Dependecies
+        - name: Prepare the environment
+          run: |
+            sudo apt update -y
+            sudo apt install -y \
+                bc bison build-essential ca-certificates clang curl cpio \
+                flex gcc gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+                git libarchive-tools libc6-dev libelf-dev libffi-dev \
+                libncurses5-dev libreadline-dev libsqlite3-dev libssl-dev \
+                lld llvm make nano neofetch openssl pigz python2 python3 \
+                software-properties-common ssh sudo wget zip zlib1g \
+                zlib1g-dev
+        
+        # Clone Clang
+        - name: clonning clang
+          run: |
+            git clone -b "${{ inputs.CLANG_BRANCH }}" "${{ inputs.CLANG_URL }}" toolchain
 
-    - name: Prepare the environment
-      run: |
-        sudo apt update -y
-        sudo apt install -y \
-          bc bison build-essential ca-certificates clang curl cpio \
-          flex gcc gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
-          git libarchive-tools libc6-dev libelf-dev libffi-dev \
-          libncurses5-dev libreadline-dev libsqlite3-dev libssl-dev \
-          lld llvm make nano neofetch openssl pigz python2 python3 \
-          software-properties-common ssh sudo wget zip zlib1g \
-          zlib1g-dev
+        # Clone Kernel
+        - name: clonning kernel source
+          run: |
+            git clone -b "${{ inputs.KERNEL_BRANCH }}" "${{ inputs.KERNEL_URL }}" kernel
 
-    - name: Clone Clang
-      run: |
-        git clone -b "${{ inputs.CLANG_BRANCH }}" "${{ inputs.CLANG_URL }}" toolchain
+        # Clone AnyKernel3
+        - name: clonning AnyKernel3
+          run: |
+            git clone https://github.com/farelfair/AnyKernel3.git anykernel3
+        
+        # Make Clean
+        - name: make clean
+          run: |
+            cd kernel
 
-    - name: Clone AnyKernel3
-      run: |
-        git clone https://github.com/farelfair/AnyKernel3.git AnyKernel3
+            make mrproper
+            make clean
+        
+        # Compile Kernel
+        - name: compile kernel
+          run: |
+            cd kernel
 
-    - name: Clone Kernel
-      run: |
-        git clone -b "${{ inputs.KERNEL_BRANCH }}" "${{ inputs.KERNEL_URL }}" kernel
+            export PATH=$(pwd)/../toolchain/bin:$PATH
+            export CROSS_COMPILE=$(pwd)/../toolchain/bin/aarch64-linux-gnu-
+            export CC=$(pwd)/../toolchain/bin/clang
+            export CLANG_TRIPLE=aarch64-linux-gnu-
+            export ARCH=arm64
+            export ANDROID_MAJOR_VERSION=r
 
-    - name: Compile Kernel
-      run: |
-        cd kernel
-
-        export PATH=$(pwd)/../toolchain/bin:$PATH
-        export CROSS_COMPILE=$(pwd)/../toolchain/bin/aarch64-linux-gnu-
-        export CC=$(pwd)/../toolchain/bin/clang
-        export CLANG_TRIPLE=aarch64-linux-gnu-
-        export ARCH=arm64
-        export ANDROID_MAJOR_VERSION=r
-
-        make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 ${{ github.event.inputs.DEFCONFIG }}
-        make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 -j$(nproc)
-
-    - name: Packing Kernel Image
-      run: |
-        cp $(pwd)/kernel/out/arch/arm64/boot/Image $(pwd)/AnyKernel3/
-        cd AnyKernel3
-        ZIP_NAME="AnyKernel3-android14-4.19.191-${{ github.event.inputs.DEVICE }}-${{ github.event.inputs.RELEASE }}.zip"
-        zip -r9 "../$ZIP_NAME" *
-        echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
-      
-    - name: Upload to Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: ${{ env.ZIP_NAME }}
-        name: New Kernel ${{ github.event.inputs.DEVICE }} Release ${{ github.event.inputs.RELEASE }}
-        tag_name: 4.19.191
-        body: |
-          Informations:
-          -> Device: ${{ github.event.inputs.DEVICE }}
-          -> Defconfig: ${{ github.event.inputs.DEFCONFIG }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 ${{ github.event.inputs.DEFCONFIG }}
+            make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 -j$(nproc)
+        
+        # Create ZIP
+        - name: Packing Kernel Image
+          run: |
+            cp $(pwd)/kernel/out/arch/arm64/boot/Image $(pwd)/anykernel3/
+            cd anykernel3
+            ZIP_NAME="AnyKernel3-android14-4.19.191-${{ github.event.inputs.DEVICE }}-${{ github.event.inputs.RELEASE_KERNEL }}.zip"
+            zip -r9 "../$ZIP_NAME" *
+            echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
+        
+        # Upload to Release
+        - name: Upload to Release
+          uses: softprops/action-gh-release@v2
+          with:
+            files: ${{ env.ZIP_NAME }}
+            name: Non GKI Kernel Release
+            tag_name: 4.19.191
+            body: |
+              Informations:
+              -> Device: ${{ github.event.inputs.DEVICE }}
+              -> Defconfig: ${{ github.event.inputs.DEFCONFIG }}
+              -> Kernel Source: ${{ github.event.inputs.KERNEL_URL }}
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
