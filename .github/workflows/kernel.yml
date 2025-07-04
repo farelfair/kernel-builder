@@ -92,7 +92,7 @@ jobs:
       run: |
         cp $(pwd)/kernel/out/arch/arm64/boot/Image $(pwd)/AnyKernel3/
         cd AnyKernel3
-        ZIP_NAME="${{ github.event.inputs.DEVICE }}-$(date +%Y%m%d-%H%M).zip"
+        ZIP_NAME="${{ github.event.inputs.DEVICE }}-$(date +%Y%m%d-%H%M)_${{ github.event.inputs.RELEASE }}.zip"
         zip -r9 "../$ZIP_NAME" *
         echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
       
@@ -100,8 +100,8 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: ${{ env.ZIP_NAME }}
-        name: ${{ github.event.inputs.DEVICE }}-${{ github.run_id }}
-        tag_name: ${{ github.event.inputs.DEVICE }}-${{ github.run_id }}
+        name: Kernel_${{ github.event.inputs.DEVICE }}-${{ github.event.inputs.RELEASE }}
+        tag_name: Kernel_${{ github.event.inputs.DEVICE }}-${{ github.event.inputs.RELEASE }}
         body: |
           Device: ${{ github.event.inputs.DEVICE }}
           Defconfig: ${{ github.event.inputs.DEFCONFIG }}
