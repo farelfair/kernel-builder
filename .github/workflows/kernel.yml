@@ -1,4 +1,4 @@
-name: Build kernel on ubuntu 22.04
+name: Compile
 
 on:
   workflow_dispatch:
