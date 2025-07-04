@@ -20,6 +20,10 @@ on:
         description: 'KERNEL_DEFCONFIG'
         required: true
         default: fleur_defconfig
+      ANYKERNEL3:
+        description: 'ANYKERNEL3_URL'
+        required: true
+        default: https://github.com/farelfair/AnyKernel3.git
 
 jobs:
   build:
