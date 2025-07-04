@@ -43,4 +43,3 @@ jobs:
           lld llvm make nano neofetch openssl pigz python2 python3 \
           software-properties-common ssh sudo wget zip zlib1g \
           zlib1g-dev
-        neofetch
