@@ -16,6 +16,9 @@ on:
       CLANG_BRANCH:
         description: 'CLANG_BRANCH'
         required: true
+      DEVICE:
+        description: 'DEVICE NAME (e.g. fleur)'
+        required: true
       DEFCONFIG:
         description: 'KERNEL_DEFCONFIG'
         required: true
@@ -35,6 +38,7 @@ jobs:
         echo "KERNEL branch: ${{ github.event.inputs.KERNEL_BRANCH }}"
         echo "clang url: ${{ github.event.inputs.CLANG_URL }}"
         echo "clang branch: ${{ github.event.inputs.ClANG_BRANCH }}"
+        echo "device name: ${{ github.event.inputs.DEVICE }}"
         echo "defconfig: ${{ github.event.inputs.DEFCONFIG }}"
         echo "::endgroup::"
 
@@ -60,8 +64,45 @@ jobs:
 
     - name: Clone AnyKernel3
       run: |
-        git clone https://github.com/farelfair/AnyKernel3.git
+        git clone https://github.com/farelfair/AnyKernel3.git AnyKernel3
 
     - name: Clone Kernel
       run: |
         git clone -b "${{ inputs.KERNEL_BRANCH }}" "${{ inputs.KERNEL_URL }}" kernel
+
+    - name: Compile Kernel
+      run: |
+        cd kernel
+
+        export PATH=$(pwd)/../toolchain/bin:$PATH
+        export CROSS_COMPILE=$(pwd)/../toolchain/bin/aarch64-linux-gnu-
+        export CC=$(pwd)/../toolchain/bin/clang
+        export CLANG_TRIPLE=aarch64-linux-gnu-
+        export ARCH=arm64
+        export ANDROID_MAJOR_VERSION=r
+
+        make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 ${{ github.event.inputs.DEFCONFIG }}
+        make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y LLVM=1 LLVM_IAS=1 -j$(nproc)
+
+    - name: Package Image
+      run: |
+        DATE=$(date +%Y-%m-%d)
+        ZIPNAME="${{ inputs.DEVICE }}-${{ inputs.RELEASE }}-${DATE}.zip"
+
+        cp $(pwd)/kernel/out/arch/arm64/boot/Image $(pwd)/AnyKernel3/
+        cd AnyKernel3
+        zip -r9 "../$ZIPNAME" *
+
+    - name: Create GitHub Release and Upload ZIP
+      uses: softprops/action-gh-release@v2
+      with:
+        name: "Release ${{ inputs.RELEASE }}"
+        tag_name: "${{ inputs.RELEASE }}"
+        body: |
+          🔧 Device: `${{ inputs.DEVICE }}`
+          📅 Build Date: $(date +%Y-%m-%d)
+          🛠️ Defconfig: `${{ inputs.DEFCONFIG }}`
+
+        files: ${{ env.ZIPNAME }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
