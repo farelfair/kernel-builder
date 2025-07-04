@@ -12,7 +12,7 @@ on:
         required: true
         default: 'main'
       DEFCONFIG:
-        description: 'Example ( fleur_defconfig )'
+        description:
         required: true
         default:
 
