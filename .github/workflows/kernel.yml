@@ -9,6 +9,10 @@ on:
       KERNEL_BRANCH:
         description: 'KERNEL_BRANCH'
         required: true
+      CLANG:
+        description: 'ClANG_VERSION'
+        required: true
+        default: https://gitlab.com/mcdofrenchfreis/android-clang-14.0.7.git
       DEFCONFIG:
         description: 'KERNEL_DEFCONFIG'
         required: true
