@@ -73,3 +73,4 @@ jobs:
     - name: Clone Kernel
       run: |
         git clone -b "${{ inputs.KERNEL_BRANCH }}" "${{ inputs.KERNEL_URL }}" kernel
+        ls
