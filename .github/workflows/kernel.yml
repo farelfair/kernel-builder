@@ -61,27 +61,3 @@ jobs:
       run: |
         git clone --b "${{ github.event.inputs.KERNEL_BRANCH }}" \
           "${{ github.event.inputs.KERNEL_URL }}" kernel
-
-    - name: Clone AnyKernel3
-        run: |
-          git clone https://github.com/farelfair/AnyKernel3.git
-
-    - name: Copy image to AnyKernel3
-        run: |
-          cp kernel/out/arch/arm64/boot/Image
-          cd AnyKernel3
-          zip -r9 ../Kernel-${{ github.event.inputs.RELEASE_NAME }}.zip ./*
-
-    - name: Upload to GitHub Releases
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ github.event.inputs.RELEASE_NAME }}
-        name: Release - ${{ github.event.inputs.RELEASE_NAME }}
-        body: |
-          ✅ Compiled kernel: `${{ github.event.inputs.RELEASE_NAME }}`
-          🔧 Defconfig: `${{ github.event.inputs.DEFCONFIG }}`  
-          🛠️ Clang: `${{ github.event.inputs.CLANG_URL }}`
-        files: |
-          Kernel-${{ github.event.inputs.RELEASE_NAME }}.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
