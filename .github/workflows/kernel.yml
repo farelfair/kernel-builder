@@ -9,10 +9,13 @@ on:
       KERNEL_BRANCH:
         description: 'KERNEL_BRANCH'
         required: true
-      CLANG:
+      CLANG_URL:
         description: 'ClANG_VERSION'
         required: true
         default: https://gitlab.com/mcdofrenchfreis/android-clang-14.0.7.git
+      CLANG_BRANCH:
+        description: 'ClANG_BRANCH'
+        required: true
       DEFCONFIG:
         description: 'KERNEL_DEFCONFIG'
         required: true
