@@ -133,5 +133,6 @@ jobs:
               -> Defconfig: ${{ github.event.inputs.DEFCONFIG }}
               -> Kernel Version: ${{ env.VERSION }}
               -> Kernel Source: ${{ github.event.inputs.KERNEL_URL }}
+              -> Clang: ${{ github.event.inputs.KERNEL_URL }}
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
